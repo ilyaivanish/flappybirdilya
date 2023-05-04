@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Flappy Bird</title>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.18.0/dist/phaser.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+        canvas {
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+
+    <script type="text/javascript">
+
+        var config = {
+            type: Phaser.AUTO,
+            width: 288,
+            height: 512,
+            physics: {
+                default: 'arcade',
+                arcade: {
+                    gravity: {
+                        y: 300
+                    },
+                    debug: false
+                }
+            },
+            scene: {
+                preload: preload,
+                create: create,
+                update: update
+            }
+        };
+
+        var game = new Phaser.Game(config);
+
+        function preload() {
+            // Backgrounds and ground
+            this.load.image('background', 'assets/background-day.png')
+            this.load.spritesheet('ground', 'assets/ground-sprite.png', {
+                frameWidth: 336,
+                frameHeight: 112
+            })
+
+            // Pipes
+            this.load.image('pipeTop', 'assets/pipe-green-top.png')
+            this.load.image('pipeBottom', 'assets/pipe-green-bottom.png')
+
+            // Bird
+            this.load.spritesheet('bird', 'assets/bird-red-sprite.png', {
+                frameWidth: 34,
+                frameHeight: 24
+            })
+
+            // Start game
+            this.load.image('start', 'assets/message-initial.png')
+
+            // End game
+            this.load.image('gameOver', 'assets/gameover.png')
+            this.load.image('restart', 'assets/restart-button.png')
+
+            this.physics.pause();
+        }
+
+        function create() {
+            // Добавление фона
+            // Create the background
+            this.add.image(0, 0, 'background').setOrigin(0, 0);
+
+            // Create the ground
+            ground = this.physics.add.sprite(168, 500, 'ground');
+            ground.setCollideWorldBounds(false);
+            ground.body.immovable = true;
+            ground.body.allowGravity = false;
+
+            this.anims.create({
+                key: 'moving-ground',
+                frames: this.anims.generateFrameNumbers('ground', {
+                    start: 0,
+                    end: 2
+                }),
+                frameRate: 15,
+                repeat: -1
+            })
+
+            ground.anims.play('moving-ground', true)
+
+            // this.anims.create({
+            //     key: assets.animation.ground.stop,
+            //     frames: [{
+            //         key: assets.scene.ground,
+            //         frame: 0
+            //     }],
+            //     frameRate: 20
+            // })
+
+            
+            // птичка
+            bird = this.physics.add.sprite(100, 250, 'bird').setScale(2);
+            bird.setCollideWorldBounds(true);
+            bird.body.gravity.y = 900;
+
+            // Add bird animations
+            this.anims.create({
+                key: 'fly',
+                frames: this.anims.generateFrameNumbers('bird', { 
+                    start: 0, 
+                    end: 2 
+                }),
+                frameRate: 10,
+                repeat: -1
+            });
+
+            // анимация полета
+            bird.anims.play('fly', true);
+
+            // полет вверх после нажатия на пробел
+            this.input.keyboard.on('keydown_SPACE', () => {
+                bird.setVelocityY(-400);
+            });
+
+            // Pipes
+            pipes = this.physics.add.group();
+
+            function createPipe() {
+                // Calculate the position of the gap between the pipes
+                const GAP_HEIGHT = 200;
+                const GAP_Y = Phaser.Math.Between(GAP_HEIGHT, game.config.height - GAP_HEIGHT);
+
+                // Create the top pipe
+                const topPipe = pipes.create(game.config.width + 100, GAP_Y - GAP_HEIGHT / 2, 'pipeTop');
+                topPipe.setOrigin(1, 1,5);
+                topPipe.body.setAllowGravity(false);
+                topPipe.body.setVelocityX(-200);
+
+                // Create the bottom pipe
+                const bottomPipe = pipes.create(game.config.width + 100, GAP_Y + GAP_HEIGHT / 2, 'pipeBottom');
+                bottomPipe.setOrigin(1, 0,5);
+                bottomPipe.body.setAllowGravity(false);
+                bottomPipe.body.setVelocityX(-200);
+            }
+
+  
+            // Add start button
+            const messageInitial = this.add.image(144, 190, 'start');
+            messageInitial.setInteractive();
+            messageInitial.on('pointerdown', () => {
+                messageInitial.visible = false;
+                this.physics.resume();
+                
+                this.time.addEvent({
+                delay: 2000,
+                callback: createPipe,
+                callbackScope: this,
+                loop: true
+            });
+            });
+
+           
+
+        }
+
+        function update() {
+            this.physics.overlap(bird, pipes, checkCollision, null, this);
+
+        }
+
+        function checkCollision(bird, pipe) {
+            // Check if the bird has hit a pipe
+            if (bird.y < pipe.y - pipe.height / 2 || bird.y > pipe.y + pipe.height / 2) {
+                this.physics.pause();
+            }
+        }
+    </script>
+</body>
+</html>
