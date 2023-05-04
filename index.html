@@ -38,7 +38,12 @@
             }
         };
 
-        var game = new Phaser.Game(config);
+        let game = new Phaser.Game(config);
+
+        function pauseGame(scene) {
+            scene.physics.pause();
+        }
+
 
         function preload() {
             // Backgrounds and ground
@@ -65,7 +70,7 @@
             this.load.image('gameOver', 'assets/gameover.png')
             this.load.image('restart', 'assets/restart-button.png')
 
-            this.physics.pause();
+            pauseGame(this);
         }
 
         function create() {
@@ -153,29 +158,48 @@
             messageInitial.on('pointerdown', () => {
                 messageInitial.visible = false;
                 this.physics.resume();
-                
                 this.time.addEvent({
-                delay: 2000,
-                callback: createPipe,
-                callbackScope: this,
-                loop: true
-            });
+                    delay: 2000,
+                    callback: createPipe,
+                    callbackScope: this,
+                    loop: true
+                });
             });
 
-           
+            // создаем иконку конец игры
+            this.gameOver = this.add.image(144, 256, 'gameOver');
+            this.gameOver.setVisible(false);
+
+            // создаем рестарт кнопку
+            this.restartButton = this.add.image(144, 300, 'restart').setInteractive();
+            this.restartButton.setVisible(false);
+
 
         }
 
         function update() {
-            this.physics.overlap(bird, pipes, checkCollision, null, this);
 
-        }
+            // функция которая вызывается после столкновения
+            function handleCollide() {
+                // End the game and pause the physics engine
+                pauseGame(this)
 
-        function checkCollision(bird, pipe) {
-            // Check if the bird has hit a pipe
-            if (bird.y < pipe.y - pipe.height / 2 || bird.y > pipe.y + pipe.height / 2) {
-                this.physics.pause();
+                // показываем гейм овер
+                this.gameOver.setVisible(true);
+
+                // Показываем кнопку перезапуска
+                this.restartButton.setVisible(true);
+                this.restartButton.on('pointerdown', function() {
+                    // Перезапускаем игру
+                    this.scene.restart();
+                }, this);
             }
+
+            this.physics.world.collide(bird, pipes, handleCollide, null, this);
+
+            this.physics.world.collide(bird, ground, handleCollide, null, this);
+
+
         }
     </script>
 </body>
