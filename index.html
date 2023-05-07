@@ -123,6 +123,7 @@
 
             // Pipes
             pipes = this.physics.add.group();
+            redline = this.physics.add.group();
 
             function createPipe() {
                 // Calculate the position of the gap between the pipes
@@ -142,7 +143,7 @@
                 bottomPipe.body.setVelocityX(-200);
 
                 // линия для пересечения и подсчета очков
-                const line = this.physics.add.sprite(game.config.width + 100, GAP_Y, 'line');
+                const line = redline.create(game.config.width + 100, GAP_Y, 'line');
                 line.setOrigin(0.5, 0.5);
                 line.body.setAllowGravity(false);
                 line.body.setVelocityX(-200);
@@ -176,15 +177,6 @@
             // счет
             this.scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#000' });
             
-            function handlePassingPipe(bird, pipe) {
-                if (bird.x > pipe.x && !pipe.data.values.scored) {
-                    pipe.data.values.scored = true;
-                    this.score++;
-                    this.scoreText.setText(`Score: ${this.score}`);
-                }
-            }
-
-            this.physics.add.overlap(bird, pipes, null, handlePassingPipe, this);
         }
 
         function update() {
@@ -208,6 +200,7 @@
             this.physics.world.collide(bird, pipes, handleCollide, null, this);
 
             this.physics.world.collide(bird, ground, handleCollide, null, this);
+            this.physics.world.collide(bird, redline, handleCollide, null, this);
 
             function handlePassingPipe(bird, pipe) {
                 this.gameOver.setVisible(true);
