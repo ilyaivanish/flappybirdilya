@@ -178,8 +178,9 @@
 
             // счет
             
-            this.scoreText = this.add.text(16, 16, `Score: ${score}`, { fontSize: '32px', fill: '#000' });
-            
+            this.scoreText = this.add.text(16, 16, `Score: ${score}`, { fontSize: '24px', fill: '#000' });
+            this.highScoreText = this.add.text(16, 54, `High Score: ${localStorage.getItem('highScore') || 0}`, { fontSize: '24px', fill: '#000' });
+
         }
 
         function update() {
@@ -201,24 +202,31 @@
                 }, this);
             }
 
+            function updateHighScore(highScoreText) {
+                let highScore = localStorage.getItem('highScore'); // получаем максимальный счет из локального хранилища
+
+                if (score > highScore) {
+                    localStorage.setItem('highScore', score); // сохраняем максимальный счет в локальное хранилище
+                    highScoreText.setText(`High Score: ${score}`); // обновляем текст максимального счета
+                }
+            }
+
             function updateScore(bird, line) {
                 if (line.scored === false) {
                     line.scored = true;
                     score += 1;
                     this.scoreText.setText('Score: ' + score);
+                    updateHighScore(this.highScoreText)
                 }
             }
 
-
             this.physics.world.collide(bird, pipes, handleCollide, null, this);
-
             this.physics.world.collide(bird, ground, handleCollide, null, this);
             this.physics.world.overlap(bird, redline, updateScore, null, this);
 
             function handlePassingPipe(bird, pipe) {
                 this.gameOver.setVisible(true);
             }
-
 
         }
     </script>
