@@ -44,6 +44,8 @@
             scene.physics.pause();
         }
 
+        let score = 0
+
 
         function preload() {
             // Backgrounds and ground
@@ -148,7 +150,7 @@
                 line.body.setAllowGravity(false);
                 line.body.setVelocityX(-200);
                 line.body.setSize(2, GAP_HEIGHT, true);
-                
+                line.scored = false;                
             }
 
   
@@ -175,7 +177,8 @@
             this.restartButton.setVisible(false);
 
             // счет
-            this.scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#000' });
+            
+            this.scoreText = this.add.text(16, 16, `Score: ${score}`, { fontSize: '32px', fill: '#000' });
             
         }
 
@@ -197,10 +200,18 @@
                 }, this);
             }
 
+            function updateScore() {
+                // Увеличиваем счет на 1
+                score += 1;
+                // Обновляем текст счета на экране
+                this.scoreText.setText(`Score: ${score}`);
+            }
+
+
             this.physics.world.collide(bird, pipes, handleCollide, null, this);
 
             this.physics.world.collide(bird, ground, handleCollide, null, this);
-            this.physics.world.collide(bird, redline, handleCollide, null, this);
+            this.physics.world.overlap(bird, redline, updateScore, null, this);
 
             function handlePassingPipe(bird, pipe) {
                 this.gameOver.setVisible(true);
