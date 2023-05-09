@@ -196,15 +196,17 @@
                 this.restartButton.setVisible(true);
                 this.restartButton.on('pointerdown', function() {
                     // Перезапускаем игру
+                    score = 0
                     this.scene.restart();
                 }, this);
             }
 
-            function updateScore() {
-                // Увеличиваем счет на 1
-                score += 1;
-                // Обновляем текст счета на экране
-                this.scoreText.setText(`Score: ${score}`);
+            function updateScore(bird, line) {
+                if (line.scored === false) {
+                    line.scored = true;
+                    score += 1;
+                    this.scoreText.setText('Score: ' + score);
+                }
             }
 
 
