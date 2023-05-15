@@ -146,13 +146,13 @@
                 line.body.setAllowGravity(false);
                 line.body.setVelocityX(-200);
                 line.body.setSize(2, GAP_HEIGHT, true);
-                line.alpha = 0.1;
+                line.alpha = 0;
                 line.scored = false;                
             }
 
   
             // Додаємо відображення кнопки старт та поведінки після її натискання
-            const messageInitial = this.add.image(144, 190, 'start');
+            const messageInitial = this.add.image(144, 260, 'start');
             messageInitial.setInteractive();
             messageInitial.on('pointerdown', () => {
                 messageInitial.visible = false;
@@ -173,8 +173,8 @@
             this.restartButton.setVisible(false);
 
             // Додаємо відображення рахунку            
-            this.scoreText = this.add.text(16, 16, `Score: ${score}`, { fontSize: '24px', fill: '#000' });
-            this.highScoreText = this.add.text(16, 54, `High Score: ${localStorage.getItem('highScore') || 0}`, { fontSize: '24px', fill: '#000' });
+            this.scoreText = this.add.text(16, 16, `Рахунок: ${score}`, { fontSize: '24px', fill: '#000' });
+            this.highScoreText = this.add.text(16, 54, `Макс. рахунок: ${localStorage.getItem('highScore') || 0}`, { fontSize: '24px', fill: '#000' });
 
         }
 
