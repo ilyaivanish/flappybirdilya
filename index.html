@@ -206,7 +206,7 @@
 
                 if (score > highScore) {
                     localStorage.setItem('highScore', score); 
-                    highScoreText.setText(`High Score: ${score}`);
+                    highScoreText.setText(`Макс. рахунок: ${score}`);
                 }
             }
 
@@ -215,7 +215,7 @@
                 if (line.scored === false) {
                     line.scored = true;
                     score += 1;
-                    this.scoreText.setText('Score: ' + score);
+                    this.scoreText.setText('Рахунок: ' + score);
                     updateHighScore(this.highScoreText)
                 }
             }
