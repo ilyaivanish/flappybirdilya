@@ -114,10 +114,14 @@
 
             bird.anims.play('fly', true);
 
-            // Політ птаха вгору після натискання пробілу
-            this.input.keyboard.on('keydown_SPACE', () => {
+            // Політ птаха вгору після натискання клавіш або натискання на екран
+            function flapBird() {
                 bird.setVelocityY(-400);
-            });
+            }
+
+            this.input.keyboard.on('keydown', flapBird);
+            this.input.on('pointerdown', flapBird);
+
 
             // Труби та лінія для збільшення рахунку 
             pipes = this.physics.add.group();
