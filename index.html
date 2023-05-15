@@ -46,30 +46,29 @@
 
         let score = 0
 
-
         function preload() {
-            // Backgrounds and ground
+            // Фон та земля
             this.load.image('background', 'assets/background-day.png')
             this.load.spritesheet('ground', 'assets/ground-sprite.png', {
                 frameWidth: 336,
                 frameHeight: 112
             })
 
-            // Pipes
+            // Труби
             this.load.image('pipeTop', 'assets/pipe-green-top.png')
             this.load.image('pipeBottom', 'assets/pipe-green-bottom.png')
             this.load.image('line', 'assets/pipe-line.png')
 
-            // Bird
+            // Пташка
             this.load.spritesheet('bird', 'assets/bird-red-sprite.png', {
                 frameWidth: 34,
                 frameHeight: 24
             })
 
-            // Start game
+            // Зображення старту гри
             this.load.image('start', 'assets/message-initial.png')
 
-            // End game
+            // Зображення програшу та рестарту
             this.load.image('gameOver', 'assets/gameover.png')
             this.load.image('restart', 'assets/restart-button.png')
 
@@ -77,11 +76,10 @@
         }
 
         function create() {
-            // Добавление фона
-            // Create the background
+            // Додаємо фон
             this.add.image(0, 0, 'background').setOrigin(0, 0);
 
-            // Create the ground
+            // Додаємо землю, яка рухається
             ground = this.physics.add.sprite(168, 500, 'ground');
             ground.setCollideWorldBounds(false);
             ground.body.immovable = true;
@@ -99,12 +97,11 @@
 
             ground.anims.play('moving-ground', true)
 
-            // птичка
+            // Додаємо птаха та його анімацію
             bird = this.physics.add.sprite(100, 250, 'bird').setScale(2);
             bird.setCollideWorldBounds(true);
             bird.body.gravity.y = 900;
 
-            // Add bird animations
             this.anims.create({
                 key: 'fly',
                 frames: this.anims.generateFrameNumbers('bird', { 
@@ -115,36 +112,35 @@
                 repeat: -1
             });
 
-            // анимация полета
             bird.anims.play('fly', true);
 
-            // полет вверх после нажатия на пробел
+            // Політ птаха вгору після натискання пробілу
             this.input.keyboard.on('keydown_SPACE', () => {
                 bird.setVelocityY(-400);
             });
 
-            // Pipes
+            // Труби та лінія для збільшення рахунку 
             pipes = this.physics.add.group();
             redline = this.physics.add.group();
 
             function createPipe() {
-                // Calculate the position of the gap between the pipes
+                // Рахуємо зазор між трубами
                 const GAP_HEIGHT = 200;
                 const GAP_Y = Phaser.Math.Between(GAP_HEIGHT, game.config.height - GAP_HEIGHT);
 
-                // Create the top pipe
+                // Створюємо верхню трубу
                 const topPipe = pipes.create(game.config.width + 100, GAP_Y - GAP_HEIGHT / 2, 'pipeTop');
                 topPipe.setOrigin(1, 1,5);
                 topPipe.body.setAllowGravity(false);
                 topPipe.body.setVelocityX(-200);
 
-                // Create the bottom pipe
+                // Створюємо нижню трубу
                 const bottomPipe = pipes.create(game.config.width + 100, GAP_Y + GAP_HEIGHT / 2, 'pipeBottom');
                 bottomPipe.setOrigin(1, 0,5);
                 bottomPipe.body.setAllowGravity(false);
                 bottomPipe.body.setVelocityX(-200);
 
-                // линия для пересечения и подсчета очков
+                // Створюємо лінію для рахунку
                 const line = redline.create(game.config.width + 100, GAP_Y, 'line');
                 line.setOrigin(0.5, 0.5);
                 line.body.setAllowGravity(false);
@@ -155,7 +151,7 @@
             }
 
   
-            // Add start button
+            // Додаємо відображення кнопки старт та поведінки після її натискання
             const messageInitial = this.add.image(144, 190, 'start');
             messageInitial.setInteractive();
             messageInitial.on('pointerdown', () => {
@@ -169,16 +165,14 @@
                 });
             });
 
-            // создаем иконку конец игры
+            // Додаємо відображення кінця гри та кнопки рестарту 
             this.gameOver = this.add.image(144, 256, 'gameOver');
             this.gameOver.setVisible(false);
 
-            // создаем рестарт кнопку
             this.restartButton = this.add.image(144, 300, 'restart').setInteractive();
             this.restartButton.setVisible(false);
 
-            // счет
-            
+            // Додаємо відображення рахунку            
             this.scoreText = this.add.text(16, 16, `Score: ${score}`, { fontSize: '24px', fill: '#000' });
             this.highScoreText = this.add.text(16, 54, `High Score: ${localStorage.getItem('highScore') || 0}`, { fontSize: '24px', fill: '#000' });
 
@@ -186,32 +180,33 @@
 
         function update() {
 
-            // функция которая вызывается после столкновения
+            // Функція яка викликається при дотику птаха до труби
             function handleCollide() {
-                // End the game and pause the physics engine
+                // Зупиняємо фізику
                 pauseGame(this)
 
-                // показываем гейм овер
+                // Відображаємо кінець гри та рестарт
                 this.gameOver.setVisible(true);
-
-                // Показываем кнопку перезапуска
                 this.restartButton.setVisible(true);
+
+                // Перезапускаємо гру
                 this.restartButton.on('pointerdown', function() {
-                    // Перезапускаем игру
                     score = 0
                     this.scene.restart();
                 }, this);
             }
 
+            // Завантаження рахунку зі стораджа
             function updateHighScore(highScoreText) {
-                let highScore = localStorage.getItem('highScore'); // получаем максимальный счет из локального хранилища
+                let highScore = localStorage.getItem('highScore'); 
 
                 if (score > highScore) {
-                    localStorage.setItem('highScore', score); // сохраняем максимальный счет в локальное хранилище
-                    highScoreText.setText(`High Score: ${score}`); // обновляем текст максимального счета
+                    localStorage.setItem('highScore', score); 
+                    highScoreText.setText(`High Score: ${score}`);
                 }
             }
 
+            // Оновлення рахунку під час гри
             function updateScore(bird, line) {
                 if (line.scored === false) {
                     line.scored = true;
@@ -221,13 +216,12 @@
                 }
             }
 
+            // Зупиняємо гру при падінні чи торканні с трубою
             this.physics.world.collide(bird, pipes, handleCollide, null, this);
             this.physics.world.collide(bird, ground, handleCollide, null, this);
-            this.physics.world.overlap(bird, redline, updateScore, null, this);
 
-            function handlePassingPipe(bird, pipe) {
-                this.gameOver.setVisible(true);
-            }
+            // Збільшуємо рахунок
+            this.physics.world.overlap(bird, redline, updateScore, null, this);
 
         }
     </script>
